@@ -2,6 +2,9 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector>
+#include <cmath>
+
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -60,56 +63,98 @@ public:
   size_t size() const;
 
 private:
-  /// Add whatever helper functions and data members you need below
-
-
-
-
+	void heapify(int root);
+	std::vector<T> data;
+	int n;
+	PComparator comp;
 };
 
-// Add implementation of member functions here
-
-
-// We will start top() for you to handle the case of 
-// calling top on an empty heap
 template <typename T, typename PComparator>
-T const & Heap<T,PComparator>::top() const
+Heap<T,PComparator>::Heap(int m, PComparator c) 
 {
-  // Here we use exceptions to handle the case of trying
-  // to access the top element of an empty heap
-  if(empty()){
-    // ================================
-    // throw the appropriate exception
-    // ================================
-
-
-  }
-  // If we get here we know the heap has at least 1 item
-  // Add code to return the top element
-
-
-
+	n = m;
+  comp = c;
 }
 
 
-// We will start pop() for you to handle the case of 
-// calling top on an empty heap
 template <typename T, typename PComparator>
-void Heap<T,PComparator>::pop()
+Heap<T,PComparator>::~Heap() 
 {
-  if(empty()){
-    // ================================
-    // throw the appropriate exception
-    // ================================
+	
+}
 
-
-  }
-
-
-
+template <typename T, typename PComparator>
+void Heap<T, PComparator>::push(const T& item) //push element into heap
+{
+  data.push_back(item);
+  std::size_t index = data.size() - 1;
+  while (index != 0) {  // loop through heap swapping parent and child until PComparator is no longer triggered
+      std::size_t parent_index = floor((index - 1) / n);
+      T& current = data[index];
+      T& parent = data[parent_index];
+      if (comp(parent, current)) // correct location found
+			{
+        break;
+      }
+      std::swap(current, parent);
+      index = parent_index;
+    }
 }
 
 
+template <typename T, typename PComparator>
+T const & Heap<T,PComparator>::top() const //return top value
+{
+  if(empty())
+	{
+  	throw std::out_of_range("heap is empty"); 
+  }
+  return data[0];
+}
+
+
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::pop() // pop 'best' value and sort heap
+{
+  if(empty())
+	{
+		throw std::out_of_range("heap is empty"); //????
+  }
+  std::swap(data.front(), data.back());
+  data.pop_back();
+	heapify(0);  
+}
+
+template <typename T, typename PComparator>
+void Heap<T, PComparator>::heapify(int root) //heapify to support pop function
+{
+    int best = root;
+    for(int i = (n*root+1); i <= (n*root+n); i++) //iterate through all children and get the best fitted child index
+    {
+        if(i < (int)data.size() && comp(data[i], data[best]))
+        {
+            best = i;
+        }
+    }
+
+    if (best != root) {
+        std::swap(data[root], data[best]); // swap and repeat till no longer possible
+        heapify(best);
+    }
+}
+
+template <typename T, typename PComparator>
+bool Heap<T, PComparator>::empty() const // return true if empty
+{
+	if(data.size() == 0)	{ return true; }
+	return false;
+}
+
+template <typename T, typename PComparator>
+size_t Heap<T, PComparator>::size() const // return heap size
+{
+	return data.size();
+}
 
 #endif
 

@@ -9,8 +9,9 @@ struct Event
     char state;
 };
 
-typedef struct EventLess {
-        //write the operator() required to make this a functor that compares Events by time
-} EventLess;
+typedef struct EventLess { //write the operator() required to make this a functor that compares Events by time
+    bool operator()(const Event* in1, const Event* in2)
+	{ return (in1->time <= in2->time);}
+} EventLess; 
 	
 #endif
